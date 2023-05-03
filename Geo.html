@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Calculadora de custo de viagem</title>
+	<style>
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 50px;
+		}
+
+		label {
+			margin-top: 10px;
+		}
+
+		input {
+			margin-left: 10px;
+			padding: 5px;
+			border-radius: 5px;
+			border: none;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+			font-size: 16px;
+		}
+
+		button {
+			margin-top: 20px;
+			margin-right: 10px;
+			padding: 10px;
+			border-radius: 5px;
+			border: none;
+			background-color: #008CBA;
+			color: white;
+			font-size: 16px;
+			cursor: pointer;
+		}
+
+		#detalhes {
+			margin-top: 20px;
+			padding: 10px;
+			border-radius: 5px;
+			border: none;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+			font-size: 16px;
+			text-align: center;
+		}
+
+        #resultado {
+        text-align: center; /* Centraliza o conteúdo */
+        font-size: 24px; /* Define o tamanho da fonte */
+        margin-top: 20px; /* Adiciona um espaçamento acima do elemento */
+    }
+    h1{
+        text-align: center;
+    }
+
+    #map {
+  height: 500px;
+  width: 100%;
+}
+
+#mapa {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+	</style>
+</head>
+<body>
+    <h1>Calculadora de custo de viagem</h1>
+
+	<form>
+		<label for="cidade">Nome da cidade destino:</label>
+		<input type="text" id="cidade">
+
+		<label for="distancia">Distância em km:</label>
+		<input type="number" id="distancia">
+
+		<label for="autonomia">Autonomia do veículo:</label>
+		<input type="number" id="autonomia">
+
+		<label for="consumo">Consumo do veículo (km/l):</label>
+		<input type="number" id="consumo">
+
+		<label for="preco">Preço atual da gasolina:</label>
+		<input type="number" id="preco">
+
+		<button type="button" onclick="calcularCusto()">Calcular</button>
+		<button type="button" onclick="limparCampos()">Limpar</button>
+        <button onclick="compartilhar()">Compartilhar no WhatsApp</button>
+	</form>
+
+    <div id="resultado"></div>
+    <br>
+    <div id="distancia"></div>
+    
+    
+
+	<p id="detalhes">Detalhes do veículo: VW Nova Saveiro PP MBVD<br>Ano Modelo 2018<br><br>Consumo urbano: 10,8 km/l (Gasolina), 7,5 km/l (Álcool)<br>Consumo Rodoviário: 12,4 km/l (Gasolina), 8,8 km/l (Álcool)<br><br>Autonomia Urbana: 594 km (Gasolina), 413 km (Álcool)<br>Autonomia Rodoviária: 682 km (Gasolina), 484 km (Álcool)</p>
+
+	<script>
+		function calcularCusto() {
+        // Pega os valores inseridos pelo usuário
+        const cidade = document.getElementById("cidade").value;
+        const distancia = Number(document.getElementById("distancia").value);
+        const autonomia = Number(document.getElementById("autonomia").value);
+        const consumo = Number(document.getElementById("consumo").value);
+        const preco = Number(document.getElementById("preco").value);
+
+        // Calcula a quantidade de litros de gasolina necessários para a viagem
+        const litros = distancia / consumo;
+
+        // Calcula o custo total da viagem em reais
+        const custo = litros * preco;
+
+        // Atualiza o conteúdo do elemento com o resultado do cálculo
+        const resultadoElement = document.getElementById("resultado");
+        resultadoElement.innerHTML = `O custo total da viagem para ${cidade} é de R$ ${custo.toFixed(2)}`;
+
+        
+    }
+
+	function limparCampos() {
+		// Limpa os campos de entrada
+		document.getElementById("cidade").value = "";
+		document.getElementById("distancia").value = "";
+		document.getElementById("autonomia").value = "";
+		document.getElementById("consumo").value = "";
+		document.getElementById("preco").value = "";
+	}
+</script>
+
+<script>
+    function compartilhar() {
+        // Pega os valores inseridos pelo usuário
+        const cidade = document.getElementById("cidade").value;
+        const distancia = Number(document.getElementById("distancia").value);
+        const autonomia = Number(document.getElementById("autonomia").value);
+        const consumo = Number(document.getElementById("consumo").value);
+        const preco = Number(document.getElementById("preco").value);
+
+        // Calcula a quantidade de litros de gasolina necessários para a viagem
+        const litros = distancia / consumo;
+
+        // Calcula o custo total da viagem em reais
+        const custo = litros * preco;
+
+        // Formata os dados em uma mensagem para compartilhar no WhatsApp
+        const mensagem = `Custo da viagem para ${cidade}: R$ ${custo.toFixed(2)} (distância: ${distancia} km, autonomia: ${autonomia} km/l, consumo: ${consumo} km/l, preço da gasolina: R$ ${preco.toFixed(2)})`;
+
+        // Cria o link para compartilhar a mensagem no WhatsApp
+        const link = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+
+        // Abre o WhatsApp com a mensagem pré-preenchida
+        window.open(link);
+    }
+</script>
+
+<script>
+    var map, infoWindow, geocoder;
+    
+    function initMap() {
+      // Cria um mapa centrado na cidade de São Paulo
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -23.5505, lng: -46.6333},
+        zoom: 12
+      });
+    
+      // Cria um objeto para geocodificar endereços
+      geocoder = new google.maps.Geocoder();
+    
+      // Cria um objeto para exibir a localização atual do usuário
+      infoWindow = new google.maps.InfoWindow();
+    
+      // Obtém a localização atual do usuário
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+    
+          // Centraliza o mapa na localização atual do usuário
+          map.setCenter(pos);
+    
+          // Cria um marcador para a localização atual do usuário
+          var marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            title: 'Localização atual'
+          });
+    
+          // Adiciona um evento de clique no marcador para exibir a localização em uma janela de informações
+          marker.addListener('click', function() {
+            infoWindow.setContent('Localização atual');
+            infoWindow.open(map, marker);
+          });
+        }, function() {
+          handleLocationError(true, infoWindow, map.getCenter());
+        });
+      } else {
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
+    }
+    
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+      infoWindow.setPosition(pos);
+      infoWindow.setContent(browserHasGeolocation ?
+                            'Erro: O serviço de localização falhou.' :
+                            'Erro: Seu navegador não suporta geolocalização.');
+      infoWindow.open(map);
+    }
+    
+    function buscarDistancia() {
+      var cidade = document.getElementById('cidade').value;
+    
+      // Geocodifica o endereço da cidade pesquisada
+      geocoder.geocode({'address': cidade}, function(results, status) {
+        if (status === 'OK') {
+          // Obtém a localização da cidade pesquisada
+          var cidadePos = results[0].geometry.location;
+    
+          // Cria uma requisição para a API do Distance Matrix
+          var service = new google.maps.DistanceMatrixService();
+          service.getDistanceMatrix({
+            origins: [infoWindow.getPosition()],
+            destinations: [cidadePos],
+            travelMode: 'DRIVING',
+            unitSystem: google.maps.UnitSystem.METRIC,
+          }, function(response, status) {
+            if (status === 'OK') {
+                var distanceText = response.rows[0].elements[0].distance.text;
+      document.getElementById('distancia').innerHTML = 'Distância até ' + cidade + ': ' + distanceText;
+    } else {
+      alert('Erro ao buscar distância: ' + status);
+    }
+  });
+} else {
+  alert('Erro ao buscar endereço da cidade: ' + status);
+}
+
+});
+}
+</script>
+</body>
+</html>
